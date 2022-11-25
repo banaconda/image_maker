@@ -23,7 +23,7 @@ def create_user(g: guestfs.GuestFS, username, public_key):
     command(g, f'adduser --disabled-password --gecos "" {username}')
     command(g, f'usermod -aG sudo {username}')
     command(g, f'mkdir /home/{username}/.ssh')
-    g.write(f'/home/{username}/.ssh/authorized_keys', public_key)
+    g.write(f'/home/{username}/.ssh/authorized_keys', public_key + '\n')
     print(command(g, f'ls -laR /home/{username}/'))
     command(g, f'chown -R {username}:{username} /home/{username}/.ssh')
     g.write(f'/etc/sudoers.d/nopassword',
