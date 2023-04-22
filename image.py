@@ -31,7 +31,7 @@ def create_user(g: guestfs.GuestFS, username, public_key):
 
 
 def create_netplan_yaml(g, interface, mac_address, vlanId, ip_with_mask, gateway, nameserver):
-    netplan_yaml = f'''
+    netplan_with_vlan_yaml = f'''
 network:
     version: 2
     ethernets:
@@ -53,7 +53,32 @@ network:
                 addresses:
                 - {nameserver}
 '''
+
+    netplan_without_vlan_yaml = f'''
+network:
+    version: 2
+    ethernets:
+        {interface}:
+            match:
+                macaddress: {mac_address}
+            set-name: {interface}
+            addresses:
+            - {ip_with_mask}
+            dhcp4: false
+            routes:
+                - to: 0.0.0.0/0
+                  via: {gateway}
+            nameservers:
+                addresses:
+                - {nameserver}
+'''
     yaml_path = '/etc/netplan/50-cloud-init.yaml'
+
+    if vlanId == 0:
+        netplan_yaml = netplan_without_vlan_yaml
+    else:
+        netplan_yaml = netplan_with_vlan_yaml
+
     g.write(yaml_path, netplan_yaml)
     print(g.cat(yaml_path))
 
