@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!venv/bin/python3
 import json
 import sys
 from volume import *
